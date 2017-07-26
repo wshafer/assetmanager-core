@@ -161,11 +161,22 @@ class AssetManager implements
         }
 
         /* Build up the response */
-        $encoding = $response->withAddedHeader('Content-Transfer-Encoding', 'binary');
-        $contentType = $encoding->withAddedHeader('Content-Type', $mimeType);
+        $encoding      = $response->withAddedHeader('Content-Transfer-Encoding', 'binary');
+        $contentType   = $encoding->withAddedHeader('Content-Type', $mimeType);
         $contentLength = $contentType->withAddedHeader('Content-Length', "$contentLength");
 
-        $final = clone $contentLength;
+        /* Add the last modified header to response */
+        $lastModified   = new \DateTime(
+            $this->asset->getLastModified(),
+            new \DateTimeZone('UTC')
+        );
+
+        $lastModified  = $contentLength->withAddedHeader(
+            'Last-Modified',
+            $lastModified->format('D, d M Y H:i:s \G\M\T')
+        );
+
+        $final = clone $lastModified;
         $final->getBody()->write($assetContents);
 
         $this->assetSetOnResponse = true;
