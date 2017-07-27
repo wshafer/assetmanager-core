@@ -136,7 +136,7 @@ class AliasPathStackResolver implements ResolverInterface, MimeResolverAwareInte
         }
 
         foreach ($this->aliases as $alias => $path) {
-            if (strpos($name, $alias) === false) {
+            if (strpos($name, $alias) !== 0) {
                 continue;
             }
 
