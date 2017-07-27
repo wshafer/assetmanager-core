@@ -79,7 +79,7 @@ class PathStackResolverTest extends TestCase
             $resolver->getPaths()->toArray()
         );
 
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $resolver->setPaths('invalid');
     }
 
@@ -135,7 +135,7 @@ class PathStackResolverTest extends TestCase
     public function testWillRefuseInvalidPath()
     {
         $resolver = new PathStackResolver();
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $resolver->addPath(null);
     }
 
