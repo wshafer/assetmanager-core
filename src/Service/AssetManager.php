@@ -166,10 +166,9 @@ class AssetManager implements
         $contentLength = $contentType->withAddedHeader('Content-Length', "$contentLength");
 
         /* Add the last modified header to response */
-        $lastModified   = new \DateTime(
-            $this->asset->getLastModified(),
-            new \DateTimeZone('UTC')
-        );
+        $lastModified   = new \DateTime();
+        $lastModified->setTimestamp($this->asset->getLastModified());
+        $lastModified->setTimezone(new \DateTimeZone('UTC'));
 
         $lastModified  = $contentLength->withAddedHeader(
             'Last-Modified',
