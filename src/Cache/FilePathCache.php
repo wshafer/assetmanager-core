@@ -73,13 +73,8 @@ class FilePathCache implements CacheInterface
         ErrorHandler::start();
 
         if (!is_dir($cacheDir)) {
-            $umask = umask(0);
             mkdir($cacheDir, 0777, true);
-            umask($umask);
-
-            // @codeCoverageIgnoreStart
         }
-        // @codeCoverageIgnoreEnd
 
         ErrorHandler::stop();
 
