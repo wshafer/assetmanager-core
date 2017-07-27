@@ -11,7 +11,6 @@ use AssetManager\Core\Resolver\CollectionResolver;
 use AssetManager\Core\Resolver\ResolverInterface;
 use AssetManager\Core\Service\AssetFilterManager;
 use AssetManager\Core\Service\MimeResolver;
-use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\TestCase;
 
 class CollectionsResolverTest extends TestCase
@@ -145,7 +144,7 @@ class CollectionsResolverTest extends TestCase
     }
 
     /**
-     * @expectedException Error
+     * @expectedException \PHPUnit_Framework_Error
      */
     public function testSetAggregateResolverFails()
     {
