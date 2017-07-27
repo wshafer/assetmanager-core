@@ -1,13 +1,13 @@
 {
     "name": "rwoverdijk/assetmanager-core",
-    "description": "An assetmanager module for Zend Framework 3.",
+    "description": "Asset Manager Core Module",
     "license": "BSD-2-Clause",
     "type": "library",
     "keywords": [
         "asset",
         "asset manager",
-        "zf3",
-        "zend framework"
+        "psr7",
+        "middleware"
     ],
     "homepage": "https://github.com/RWOverdijk/AssetManager",
     "authors": [
@@ -20,6 +20,10 @@
             "name": "Marco Pivetta",
             "email": "ocramius@gmail.com",
             "homepage": "http://ocramius.github.com/"
+        },
+        {
+            "name": "Westin Shafer",
+            "email": "shafer_w2002@yahoo.com.com"
         }
     ],
     "require": {
