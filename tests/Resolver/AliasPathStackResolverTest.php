@@ -275,6 +275,26 @@ class AliasPathStackResolverTest extends TestCase
     }
 
     /**
+     * BUG: https://github.com/RWOverdijk/AssetManager/issues/194
+     *
+     * @covers \AssetManager\Core\Resolver\AliasPathStackResolver::resolve
+     */
+    public function testResolveForFalsePositives()
+    {
+        $map = array(
+            'images/' => __DIR__,
+            'public-images/' =>  __DIR__.'/../Config'
+        );
+
+        $resolver = new AliasPathStackResolver($map);
+        $mimeResolver = new MimeResolver();
+        $resolver->setMimeResolver(new MimeResolver());
+        $fileAsset           = new Asset\FileAsset(realpath(__DIR__.'/../Config/ConfigTest.php'));
+        $fileAsset->mimetype = $mimeResolver->getMimeType(__FILE__);
+        $this->assertEquals($fileAsset, $resolver->resolve('public-images/ConfigTest.php'));
+    }
+
+    /**
      * Test Lfi Protection
      *
      * @covers \AssetManager\Core\Resolver\AliasPathStackResolver::resolve
