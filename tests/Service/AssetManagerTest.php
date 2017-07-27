@@ -450,6 +450,7 @@ class AssetManagerTest extends TestCase
 
         $request  = $this->getRequest();
         $assetManager->resolvesToAsset($request);
+
         $response = $assetManager->setAssetOnResponse(new Response);
         $thisFile = file_get_contents(__FILE__);
 
@@ -460,11 +461,15 @@ class AssetManagerTest extends TestCase
         }
 
         $mimeType = $mimeResolver->getMimeType(__FILE__);
+        $lastModified   = new \DateTime();
+        $lastModified->setTimestamp(filemtime(__FILE__));
+        $lastModified->setTimezone(new \DateTimeZone('UTC'));
 
         $headers = [
             'Content-Transfer-Encoding' => ['binary'],
             'Content-Type' => [$mimeType],
-            'Content-Length' => [$fileSize]
+            'Content-Length' => [$fileSize],
+            'Last-Modified' => [$lastModified->format('D, d M Y H:i:s \G\M\T')],
         ];
 
         $this->assertEquals($headers, $response->getHeaders());
