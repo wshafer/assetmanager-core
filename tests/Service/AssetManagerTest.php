@@ -28,9 +28,9 @@ class AssetManagerTest extends TestCase
         require_once __DIR__ . '/../_files/ReverseFilter.php';
     }
 
-    protected function getRequest()
+    protected function getRequest($uri = 'http://localhost/asset-path')
     {
-        $uri = new Uri('http://localhost/asset-path');
+        $uri = new Uri($uri);
         $request = new ServerRequest();
 
         return $request->withUri($uri);
@@ -38,10 +38,11 @@ class AssetManagerTest extends TestCase
 
     /**
      * @param string $resolveTo
+     * @param string $requestedPath
      *
      * @return \PHPUnit_Framework_MockObject_MockObject|ResolverInterface
      */
-    protected function getResolver($resolveTo = __FILE__)
+    protected function getResolver($resolveTo = __FILE__, $requestedPath = 'asset-path')
     {
         $mimeResolver    = new MimeResolver;
         $asset           = new Asset\FileAsset($resolveTo);
@@ -50,7 +51,7 @@ class AssetManagerTest extends TestCase
         $resolver
             ->expects($this->once())
             ->method('resolve')
-            ->with('asset-path')
+            ->with($requestedPath)
             ->will($this->returnValue($asset));
 
         return $resolver;
@@ -119,6 +120,19 @@ class AssetManagerTest extends TestCase
     {
         $assetManager    = new AssetManager($this->getResolver());
         $resolvesToAsset = $assetManager->resolvesToAsset($this->getRequest());
+
+        $this->assertTrue($resolvesToAsset);
+    }
+
+    /**
+     * Test for spaces in path.
+     *
+     * BUG: https://github.com/RWOverdijk/AssetManager/issues/107
+     */
+    public function testResolvesToAssetWithSpaces()
+    {
+        $assetManager    = new AssetManager($this->getResolver(__FILE__, 'asset path'));
+        $resolvesToAsset = $assetManager->resolvesToAsset($this->getRequest('http://localhost/asset%20path'));
 
         $this->assertTrue($resolvesToAsset);
     }

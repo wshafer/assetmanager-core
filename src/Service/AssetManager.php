@@ -183,7 +183,7 @@ class AssetManager implements
     protected function resolve(ServerRequestInterface $request)
     {
         $uri        = $request->getUri();
-        $path       = ltrim($uri->getPath(), '/');
+        $path       = $this->normalizePath($uri->getPath());
         $this->path = $path;
         $asset      = $this->getResolver()->resolve($path);
 
@@ -192,6 +192,18 @@ class AssetManager implements
         }
 
         return $asset;
+    }
+
+    /**
+     * Normalize the path
+     *
+     * @param $path
+     *
+     * @return string
+     */
+    protected function normalizePath($path)
+    {
+        return ltrim(rawurldecode($path), '/');
     }
 
     /**
