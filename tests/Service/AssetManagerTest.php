@@ -475,15 +475,15 @@ class AssetManagerTest extends TestCase
         }
 
         $mimeType = $mimeResolver->getMimeType(__FILE__);
-        $lastModified   = new \DateTime();
+        $lastModified = new \DateTime();
         $lastModified->setTimestamp(filemtime(__FILE__));
         $lastModified->setTimezone(new \DateTimeZone('UTC'));
 
         $headers = [
             'Content-Transfer-Encoding' => ['binary'],
-            'Content-Type' => [$mimeType],
-            'Content-Length' => [$fileSize],
-            'Last-Modified' => [$lastModified->format('D, d M Y H:i:s \G\M\T')],
+            'Content-Type'              => [$mimeType],
+            'Content-Length'            => [$fileSize],
+            'Last-Modified'             => [$lastModified->format('D, d M Y H:i:s \G\M\T')],
         ];
 
         $this->assertEquals($headers, $response->getHeaders());
