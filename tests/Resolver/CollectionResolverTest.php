@@ -311,9 +311,7 @@ class CollectionsResolverTest extends TestCase
             ),
         ));
 
-        $mimeResolver = new MimeResolver;
         $assetFilterManager = new AssetFilterManager();
-        $assetFilterManager->setMimeResolver($mimeResolver);
 
         $resolver->setAggregateResolver($aggregateResolver);
         $resolver->setAssetFilterManager($assetFilterManager);
@@ -382,10 +380,7 @@ class CollectionsResolverTest extends TestCase
         ));
 
 
-        $mimeResolver = new MimeResolver;
         $assetFilterManager = new AssetFilterManager();
-
-        $assetFilterManager->setMimeResolver($mimeResolver);
 
         $resolver->setAggregateResolver($aggregateResolver);
         $resolver->setAssetFilterManager($assetFilterManager);

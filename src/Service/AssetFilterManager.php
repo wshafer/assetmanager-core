@@ -87,6 +87,10 @@ class AssetFilterManager
             return $config[$path];
         }
 
+        if (!empty($asset->mimetype) && !empty($config[$asset->mimetype])) {
+            return $config[$asset->mimetype];
+        }
+
         $extension = strtolower(pathinfo($asset->getSourcePath(), PATHINFO_EXTENSION));
 
         if (!empty($config[$extension])) {
