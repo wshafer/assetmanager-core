@@ -34,6 +34,25 @@ class AssetFilterManagerTest extends TestCase
         $this->assertEquals('Herp Derp', $asset->dump());
     }
 
+    public function testByExtension()
+    {
+        $assetFilterManager = new AssetFilterManager(array(
+            'less' => array(
+                array(
+                    'service' => 'testFilter',
+                )
+            )
+        ));
+
+        $serviceManager = new ServiceManager();
+        $serviceManager->setService('testFilter', new \CustomFilter());
+        $assetFilterManager->setContainer($serviceManager);
+
+        $asset = new StringAsset('Herp derp', [], null, 'test.less');
+        $assetFilterManager->setFilters('test.less', $asset);
+        $this->assertEquals('called', $asset->dump());
+    }
+
     public function testensureByService()
     {
         $assetFilterManager = new AssetFilterManager(array(
