@@ -8,7 +8,7 @@ use AssetManager\Core\Exception;
 use AssetManager\Core\Resolver\MimeResolverAwareInterface;
 use Psr\Container\ContainerInterface;
 
-class AssetFilterManager implements MimeResolverAwareInterface
+class AssetFilterManager
 {
     /**
      * @var array Filter configuration.
@@ -21,15 +21,10 @@ class AssetFilterManager implements MimeResolverAwareInterface
     protected $container;
 
     /**
-     * @var MimeResolver
-     */
-    protected $mimeResolver;
-
-    /**
      * @var FilterInterface[] Filters already instantiated
      */
     protected $filterInstances = array();
-
+    
     /**
      * Construct the AssetFilterManager
      *
@@ -70,35 +65,56 @@ class AssetFilterManager implements MimeResolverAwareInterface
      */
     public function setFilters($path, AssetInterface $asset)
     {
+        $filters = $this->getFilters($path, $asset);
+
+        foreach ($filters as $filter) {
+            $this->setFilter($filter, $asset);
+        }
+    }
+
+    /**
+     * Get the filters from config based on path, mimetype or extension.
+     *
+     * @param $path
+     * @param AssetInterface $asset
+     * @return array|mixed
+     */
+    protected function getFilters($path, AssetInterface $asset)
+    {
         $config = $this->getConfig();
 
         if (!empty($config[$path])) {
-            $filters = $config[$path];
-        } elseif (!empty($config[$asset->mimetype])) {
-            $filters = $config[$asset->mimetype];
-        } else {
-            $extension = $this->getMimeResolver()->getExtension($asset->mimetype);
-            if (!empty($config[$extension])) {
-                $filters = $config[$extension];
-            } else {
-                return;
-            }
+            return $config[$path];
         }
 
-        foreach ($filters as $filter) {
-            if (is_null($filter)) {
-                continue;
-            }
-            if (!empty($filter['filter'])) {
-                $this->ensureByFilter($asset, $filter['filter']);
-            } elseif (!empty($filter['service'])) {
-                $this->ensureByService($asset, $filter['service']);
-            } else {
-                throw new Exception\RuntimeException(
-                    'Invalid filter supplied. Expected Filter or Service.'
-                );
-            }
+        $extension = strtolower(pathinfo($asset->getSourcePath(), PATHINFO_EXTENSION));
+
+        if (!empty($config[$extension])) {
+            return $config[$extension];
         }
+
+        return [];
+    }
+
+    protected function setFilter($filter, AssetInterface $asset)
+    {
+        if (is_null($filter)) {
+            return;
+        }
+
+        if (!empty($filter['filter'])) {
+            $this->ensureByFilter($asset, $filter['filter']);
+            return;
+        }
+
+        if (!empty($filter['service'])) {
+            $this->ensureByService($asset, $filter['service']);
+            return;
+        }
+
+        throw new Exception\RuntimeException(
+            'Invalid filter supplied. Expected Filter or Service.'
+        );
     }
 
     /**
@@ -155,22 +171,6 @@ class AssetFilterManager implements MimeResolverAwareInterface
         $filterInstance = $this->filterInstances[$filterClass];
 
         $asset->ensureFilter($filterInstance);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getMimeResolver()
-    {
-        return $this->mimeResolver;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setMimeResolver(MimeResolver $resolver)
-    {
-        $this->mimeResolver = $resolver;
     }
 
     /**
