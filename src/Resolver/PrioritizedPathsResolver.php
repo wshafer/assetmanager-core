@@ -3,10 +3,8 @@
 namespace AssetManager\Core\Resolver;
 
 use ArrayAccess;
-use Assetic\Asset\FileAsset;
 use Assetic\Factory\Resource\DirectoryResource;
 use AssetManager\Core\Exception;
-use AssetManager\Core\Service\MimeResolver;
 use SplFileInfo;
 use Traversable;
 use Zend\Stdlib\PriorityQueue;

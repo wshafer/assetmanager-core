@@ -2,10 +2,7 @@
 
 namespace AssetManager\Core\Resolver;
 
-use Assetic\Asset\FileAsset;
-use Assetic\Asset\HttpAsset;
 use AssetManager\Core\Exception;
-use AssetManager\Core\Service\MimeResolver;
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
 
