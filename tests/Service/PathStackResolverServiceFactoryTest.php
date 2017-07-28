@@ -21,8 +21,8 @@ class PathStackResolverServiceFactoryTest extends TestCase
                 'asset_manager' => array(
                     'resolver_configs' => array(
                         'paths' => array(
-                            'path1/',
-                            'path2/',
+                            'path1' . DIRECTORY_SEPARATOR,
+                            'path2' . DIRECTORY_SEPARATOR,
                         ),
                     ),
                 ),
@@ -34,8 +34,8 @@ class PathStackResolverServiceFactoryTest extends TestCase
         $resolver = $factory($serviceManager);
         $this->assertSame(
             array(
-                'path2/',
-                'path1/',
+                'path2' . DIRECTORY_SEPARATOR,
+                'path1' . DIRECTORY_SEPARATOR,
             ),
             $resolver->getPaths()->toArray()
         );
