@@ -108,12 +108,12 @@ class MapResolverTest extends TestCase
         $resolver->setMimeResolver($mimeResolver);
 
         $asset1 = array(
-            'bacon' => __FILE__,
+            'bacon.php' => __FILE__,
         );
 
         $resolver->setMap($asset1);
 
-        $asset      = $resolver->resolve('bacon');
+        $asset      = $resolver->resolve('bacon.php');
         $mimetype   = $mimeResolver->getMimeType(__FILE__);
 
         $this->assertTrue($asset instanceof Asset\FileAsset);
@@ -127,19 +127,19 @@ class MapResolverTest extends TestCase
         $mimeResolver = $this->createMock(MimeResolver::class);
 
         $mimeResolver->expects($this->any())
-            ->method('getMimeType')
-            ->with('http://foo.bar/')
-            ->will($this->returnValue('text/foo'));
+                ->method('getMimeType')
+                ->with('bacon.bar')
+                ->will($this->returnValue('text/foo'));
 
         $resolver->setMimeResolver($mimeResolver);
 
         $asset1 = array(
-            'bacon' => 'http://foo.bar/',
+            'bacon.bar' => 'http://foo.bar/',
         );
 
         $resolver->setMap($asset1);
 
-        $asset      = $resolver->resolve('bacon');
+        $asset      = $resolver->resolve('bacon.bar');
 
         $this->assertTrue($asset instanceof Asset\HttpAsset);
         $this->assertSame('text/foo', $asset->mimetype);
