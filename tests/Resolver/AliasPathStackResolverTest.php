@@ -5,7 +5,6 @@ namespace AssetManager\Core\Test\Resolver;
 use Assetic\Asset;
 use AssetManager\Core\Resolver\AliasPathStackResolver;
 use AssetManager\Core\Service\MimeResolver;
-use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,7 +39,7 @@ class AliasPathStackResolverTest extends TestCase
      * Test constructor fails when aliases passed in is not an array
      *
      * @covers \AssetManager\Core\Resolver\AliasPathStackResolver::__construct
-     * @expectedException Error
+     * @expectedException \PHPUnit_Framework_Error
      */
     public function testConstructorFail()
     {
@@ -163,7 +162,7 @@ class AliasPathStackResolverTest extends TestCase
      * Test Set Mime Resolver Only Accepts a mime Resolver
      *
      * @covers \AssetManager\Core\Resolver\AliasPathStackResolver::setMimeResolver
-     * @expectedException Error
+     * @expectedException \PHPUnit_Framework_Error
      */
     public function testSetMimeResolverFailObject()
     {

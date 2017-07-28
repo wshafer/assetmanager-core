@@ -110,7 +110,7 @@ class AssetFilterManagerTest extends TestCase
         
         $asset = $this->createMock(AssetInterface::class);
         $asset
-            ->expects($this->any())
+            ->expects($this->atLeastOnce())
             ->method('ensureFilter')
             ->with($this->callback(function (FilterInterface $filter) use (&$filterInstance) {
                 if ($filterInstance === null) {
