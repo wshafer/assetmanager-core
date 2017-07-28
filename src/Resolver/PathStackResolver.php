@@ -13,26 +13,14 @@ use Zend\Stdlib\SplStack;
 /**
  * This resolver allows you to resolve from a stack of paths.
  */
-class PathStackResolver implements ResolverInterface, MimeResolverAwareInterface
+class PathStackResolver extends FileResolverAbstract
 {
+    use LfiProtectionTrait;
+
     /**
      * @var SplStack
      */
     protected $paths;
-
-    /**
-     * Flag indicating whether or not LFI protection for rendering view scripts is enabled
-     *
-     * @var bool
-     */
-    protected $lfiProtectionOn = true;
-
-    /**
-     * The mime resolver.
-     *
-     * @var MimeResolver
-     */
-    protected $mimeResolver;
 
     /**
      * Constructor
@@ -40,26 +28,6 @@ class PathStackResolver implements ResolverInterface, MimeResolverAwareInterface
     public function __construct()
     {
         $this->paths = new SplStack();
-    }
-
-    /**
-     * Set the mime resolver
-     *
-     * @param MimeResolver $resolver
-     */
-    public function setMimeResolver(MimeResolver $resolver)
-    {
-        $this->mimeResolver = $resolver;
-    }
-
-    /**
-     * Get the mime resolver
-     *
-     * @return MimeResolver
-     */
-    public function getMimeResolver()
-    {
-        return $this->mimeResolver;
     }
 
     /**
@@ -146,27 +114,6 @@ class PathStackResolver implements ResolverInterface, MimeResolverAwareInterface
     }
 
     /**
-     * Set LFI protection flag
-     *
-     * @param  bool $flag
-     * @return void
-     */
-    public function setLfiProtection($flag)
-    {
-        $this->lfiProtectionOn = (bool) $flag;
-    }
-
-    /**
-     * Return status of LFI protection flag
-     *
-     * @return bool
-     */
-    public function isLfiProtectionOn()
-    {
-        return $this->lfiProtectionOn;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function resolve($name)
@@ -176,17 +123,14 @@ class PathStackResolver implements ResolverInterface, MimeResolverAwareInterface
         }
 
         foreach ($this->getPaths() as $path) {
-            $file = new SplFileInfo($path . $name);
+            $asset = $this->resolveFile($path . $name);
 
-            if ($file->isReadable() && !$file->isDir()) {
-                $filePath = $file->getRealPath();
-                $mimeType = $this->getMimeResolver()->getMimeType($name);
-                $asset    = new FileAsset($filePath);
-
-                $asset->mimetype = $mimeType;
-
-                return $asset;
+            if (!$asset) {
+                return null;
             }
+
+            $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
+            return $asset;
         }
 
         return null;
