@@ -164,7 +164,6 @@ class ConcatResolverTest extends TestCase
 
         $assetFilterManager = new AssetFilterManager();
         $mimeResolver = new MimeResolver;
-        $assetFilterManager->setMimeResolver($mimeResolver);
         $resolver->setMimeResolver($mimeResolver);
         $resolver->setAssetFilterManager($assetFilterManager);
 
