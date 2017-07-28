@@ -2,36 +2,22 @@
 
 namespace AssetManager\Core\Resolver;
 
-use Assetic\Asset\FileAsset;
 use Assetic\Factory\Resource\DirectoryResource;
 use AssetManager\Core\Exception;
-use AssetManager\Core\Service\MimeResolver;
 use SplFileInfo;
 use Zend\Stdlib\SplStack;
 
 /**
  * This resolver allows you to resolve from a stack of aliases to a path.
  */
-class AliasPathStackResolver implements ResolverInterface, MimeResolverAwareInterface
+class AliasPathStackResolver extends FileResolverAbstract
 {
+    use LfiProtectionTrait;
+
     /**
      * @var array
      */
     protected $aliases = [];
-
-    /**
-     * Flag indicating whether or not LFI protection for rendering view scripts is enabled
-     *
-     * @var bool
-     */
-    protected $lfiProtectionOn = true;
-
-    /**
-     * The mime resolver.
-     *
-     * @var MimeResolver
-     */
-    protected $mimeResolver;
 
     /**
      * Constructor
@@ -86,47 +72,6 @@ class AliasPathStackResolver implements ResolverInterface, MimeResolverAwareInte
     }
 
     /**
-     * Set the mime resolver
-     *
-     * @param MimeResolver $resolver
-     */
-    public function setMimeResolver(MimeResolver $resolver)
-    {
-        $this->mimeResolver = $resolver;
-    }
-
-    /**
-     * Get the mime resolver
-     *
-     * @return MimeResolver
-     */
-    public function getMimeResolver()
-    {
-        return $this->mimeResolver;
-    }
-
-    /**
-     * Set LFI protection flag
-     *
-     * @param  bool $flag
-     * @return void
-     */
-    public function setLfiProtection($flag)
-    {
-        $this->lfiProtectionOn = (bool) $flag;
-    }
-
-    /**
-     * Return status of LFI protection flag
-     *
-     * @return bool
-     */
-    public function isLfiProtectionOn()
-    {
-        return $this->lfiProtectionOn;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function resolve($name)
@@ -142,17 +87,14 @@ class AliasPathStackResolver implements ResolverInterface, MimeResolverAwareInte
 
             $filename = substr_replace($name, '', 0, strlen($alias));
 
-            $file = new SplFileInfo($path . $filename);
+            $asset = $this->resolveFile($path . $filename);
 
-            if ($file->isReadable() && !$file->isDir()) {
-                $filePath = $file->getRealPath();
-                $mimeType = $this->getMimeResolver()->getMimeType($name);
-                $asset    = new FileAsset($filePath);
-
-                $asset->mimetype = $mimeType;
-
-                return $asset;
+            if (!$asset) {
+                continue;
             }
+
+            $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
+            return $asset;
         }
 
         return null;
