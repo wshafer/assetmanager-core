@@ -8,7 +8,6 @@ use AssetManager\Core\Exception;
 use AssetManager\Core\Service\AssetFilterManager;
 use AssetManager\Core\Service\AssetFilterManagerAwareInterface;
 use Traversable;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * This resolver allows the resolving of collections.
@@ -20,6 +19,8 @@ class CollectionResolver implements
     AggregateResolverAwareInterface,
     AssetFilterManagerAwareInterface
 {
+    use CollectionTrait;
+
     /**
      * @var ResolverInterface
      */
@@ -31,11 +32,6 @@ class CollectionResolver implements
     protected $filterManager;
 
     /**
-     * @var array the collections
-     */
-    protected $collections = array();
-
-    /**
      * Constructor
      *
      * Instantiate and optionally populate collections.
@@ -45,31 +41,6 @@ class CollectionResolver implements
     public function __construct($collections = array())
     {
         $this->setCollections($collections);
-    }
-
-    /**
-     * Set (overwrite) collections
-     *
-     * Collections should be arrays or Traversable objects with name => path pairs
-     *
-     * @param  array|Traversable                  $collections
-     * @throws Exception\InvalidArgumentException
-     */
-    public function setCollections($collections)
-    {
-        if (!is_array($collections) && !$collections instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s: expects an array or Traversable, received "%s"',
-                __METHOD__,
-                (is_object($collections) ? get_class($collections) : gettype($collections))
-            ));
-        }
-
-        if ($collections instanceof Traversable) {
-            $collections = ArrayUtils::iteratorToArray($collections);
-        }
-
-        $this->collections = $collections;
     }
 
     /**
@@ -93,25 +64,17 @@ class CollectionResolver implements
     }
 
     /**
-     * Retrieve the collections
-     *
-     * @return array
-     */
-    public function getCollections()
-    {
-        return $this->collections;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function resolve($name)
     {
-        if (!isset($this->collections[$name])) {
+        $collections = $this->getCollections();
+
+        if (!isset($collections[$name])) {
             return null;
         }
 
-        if (!is_array($this->collections[$name])) {
+        if (!is_array($collections[$name])) {
             throw new Exception\RuntimeException(
                 "Collection with name $name is not an an array."
             );
@@ -121,7 +84,7 @@ class CollectionResolver implements
         $mimeType   = null;
         $collection->setTargetPath($name);
 
-        foreach ($this->collections[$name] as $asset) {
+        foreach ($collections[$name] as $asset) {
             if (!is_string($asset)) {
                 throw new Exception\RuntimeException(
                     'Asset should be of type string. got ' . gettype($asset)

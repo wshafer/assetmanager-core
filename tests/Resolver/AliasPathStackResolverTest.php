@@ -174,38 +174,7 @@ class AliasPathStackResolverTest extends TestCase
         $resolver->setMimeResolver(new \stdClass());
     }
 
-    /**
-     * Test Lfi Protection Flag Defaults to true
-     *
-     * @covers \AssetManager\Core\Resolver\AliasPathStackResolver::isLfiProtectionOn
-     */
-    public function testLfiProtectionFlagDefaultsTrue()
-    {
-        $resolver = new AliasPathStackResolver(array('my/alias/' => __DIR__));
-        $returned = $resolver->isLfiProtectionOn();
 
-        $this->assertTrue($returned);
-    }
-
-    /**
-     * Test Get and Set of Lfi Protection Flag
-     *
-     * @covers \AssetManager\Core\Resolver\AliasPathStackResolver::setLfiProtection
-     * @covers \AssetManager\Core\Resolver\AliasPathStackResolver::isLfiProtectionOn
-     */
-    public function testGetAndSetOfLfiProtectionFlag()
-    {
-        $resolver = new AliasPathStackResolver(array('my/alias/' => __DIR__));
-        $resolver->setLfiProtection(true);
-        $returned = $resolver->isLfiProtectionOn();
-
-        $this->assertTrue($returned);
-
-        $resolver->setLfiProtection(false);
-        $returned = $resolver->isLfiProtectionOn();
-
-        $this->assertFalse($returned);
-    }
 
     /**
      * Test Resolve returns valid asset
