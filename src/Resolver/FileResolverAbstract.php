@@ -27,11 +27,25 @@ abstract class FileResolverAbstract implements ResolverInterface, MimeResolverAw
         return $this->getFileAsset($file);
     }
 
+    /**
+     * Get an HTML Asset
+     *
+     * @param string $filePath
+     *
+     * @return HttpAsset
+     */
     protected function getHtmlAsset($filePath)
     {
         return new HttpAsset($filePath);
     }
 
+    /**
+     * Get a File Asset
+     *
+     * @param string $filePath
+     *
+     * @return FileAsset|null
+     */
     protected function getFileAsset($filePath)
     {
         $file = new \SplFileInfo($filePath);
