@@ -28,7 +28,7 @@ class AssetFilterManager
     /**
      * Construct the AssetFilterManager
      *
-     * @param   array $config
+     * @param array $config
      */
     public function __construct(array $config = array())
     {
@@ -38,7 +38,7 @@ class AssetFilterManager
     /**
      * Get the filter configuration.
      *
-     * @return  array
+     * @return array
      */
     protected function getConfig()
     {
@@ -58,8 +58,8 @@ class AssetFilterManager
     /**
      * See if there are filters for the asset, and if so, set them.
      *
-     * @param   string          $path
-     * @param   AssetInterface  $asset
+     * @param string         $path
+     * @param AssetInterface $asset
      *
      * @throws Exception\RuntimeException on invalid filters
      */
@@ -75,8 +75,9 @@ class AssetFilterManager
     /**
      * Get the filters from config based on path, mimetype or extension.
      *
-     * @param $path
+     * @param string $path
      * @param AssetInterface $asset
+     *
      * @return array|mixed
      */
     protected function getFilters($path, AssetInterface $asset)
@@ -100,6 +101,12 @@ class AssetFilterManager
         return [];
     }
 
+    /**
+     * Set the filter by filter or service
+     *
+     * @param string         $filter
+     * @param AssetInterface $asset
+     */
     protected function setFilter($filter, AssetInterface $asset)
     {
         if (is_null($filter)) {
@@ -108,11 +115,13 @@ class AssetFilterManager
 
         if (!empty($filter['filter'])) {
             $this->ensureByFilter($asset, $filter['filter']);
+
             return;
         }
 
         if (!empty($filter['service'])) {
             $this->ensureByService($asset, $filter['service']);
+
             return;
         }
 
@@ -124,8 +133,9 @@ class AssetFilterManager
     /**
      * Ensure that the filters as service are set.
      *
-     * @param   AssetInterface  $asset
-     * @param   string          $service    A valid service name.
+     * @param AssetInterface $asset
+     * @param string         $service A valid service name.
+     *
      * @throws  Exception\RuntimeException
      */
     protected function ensureByService(AssetInterface $asset, $service)
@@ -142,8 +152,9 @@ class AssetFilterManager
     /**
      * Ensure that the filters as filter are set.
      *
-     * @param   AssetInterface  $asset
-     * @param   mixed           $filter    Either an instance of FilterInterface or a classname.
+     * @param AssetInterface $asset
+     * @param mixed          $filter Either an instance of FilterInterface or a classname.
+     *
      * @throws  Exception\RuntimeException
      */
     protected function ensureByFilter(AssetInterface $asset, $filter)
