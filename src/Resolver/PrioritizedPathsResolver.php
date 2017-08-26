@@ -3,8 +3,10 @@
 namespace AssetManager\Core\Resolver;
 
 use ArrayAccess;
+use Assetic\Asset\FileAsset;
 use Assetic\Factory\Resource\DirectoryResource;
 use AssetManager\Core\Exception;
+use AssetManager\Core\Service\MimeResolver;
 use SplFileInfo;
 use Traversable;
 use Zend\Stdlib\PriorityQueue;
@@ -15,12 +17,17 @@ use Zend\Stdlib\SplStack;
  */
 class PrioritizedPathsResolver extends FileResolverAbstract
 {
-    use LfiProtectionTrait;
-
     /**
      * @var PriorityQueue|ResolverInterface[]
      */
     protected $paths;
+
+    /**
+     * Flag indicating whether or not LFI protection for rendering view scripts is enabled
+     *
+     * @var bool
+     */
+    protected $lfiProtectionOn = true;
 
     /**
      * Constructor.
@@ -74,12 +81,12 @@ class PrioritizedPathsResolver extends FileResolverAbstract
         $this->paths = new PriorityQueue();
     }
 
-    /**
-     * Add many paths to the stack at once
-     *
-     * @param  array|Traversable $paths
-     * @return void
-     */
+     /**
+      * Add many paths to the stack at once
+      *
+      * @param  array|Traversable $paths
+      * @return void
+      */
     public function addPaths($paths)
     {
         foreach ($paths as $path) {
@@ -121,6 +128,27 @@ class PrioritizedPathsResolver extends FileResolverAbstract
     }
 
     /**
+     * Set LFI protection flag
+     *
+     * @param  bool $flag
+     * @return void
+     */
+    public function setLfiProtection($flag)
+    {
+        $this->lfiProtectionOn = (bool) $flag;
+    }
+
+    /**
+     * Return status of LFI protection flag
+     *
+     * @return bool
+     */
+    public function isLfiProtectionOn()
+    {
+        return $this->lfiProtectionOn;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function resolve($name)
@@ -137,6 +165,7 @@ class PrioritizedPathsResolver extends FileResolverAbstract
             }
 
             $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
+
             return $asset;
         }
 

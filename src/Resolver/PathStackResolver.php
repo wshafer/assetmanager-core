@@ -13,12 +13,17 @@ use Zend\Stdlib\SplStack;
  */
 class PathStackResolver extends FileResolverAbstract
 {
-    use LfiProtectionTrait;
-
     /**
      * @var SplStack
      */
     protected $paths;
+
+    /**
+     * Flag indicating whether or not LFI protection for rendering view scripts is enabled
+     *
+     * @var bool
+     */
+    protected $lfiProtectionOn = true;
 
     /**
      * Constructor
@@ -112,6 +117,27 @@ class PathStackResolver extends FileResolverAbstract
     }
 
     /**
+     * Set LFI protection flag
+     *
+     * @param  bool $flag
+     * @return void
+     */
+    public function setLfiProtection($flag)
+    {
+        $this->lfiProtectionOn = (bool) $flag;
+    }
+
+    /**
+     * Return status of LFI protection flag
+     *
+     * @return bool
+     */
+    public function isLfiProtectionOn()
+    {
+        return $this->lfiProtectionOn;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function resolve($name)
@@ -128,6 +154,7 @@ class PathStackResolver extends FileResolverAbstract
             }
 
             $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
+
             return $asset;
         }
 

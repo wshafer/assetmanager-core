@@ -79,6 +79,7 @@ class MapResolver extends FileResolverAbstract
         }
 
         $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
+
         return $asset;
     }
 
