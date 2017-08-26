@@ -15,7 +15,7 @@ use Zend\Stdlib\SplStack;
 /**
  * This resolver allows you to resolve from a multitude of prioritized paths.
  */
-class PrioritizedPathsResolver implements ResolverInterface, MimeResolverAwareInterface
+class PrioritizedPathsResolver extends FileResolverAbstract
 {
     /**
      * @var PriorityQueue|ResolverInterface[]
@@ -30,39 +30,12 @@ class PrioritizedPathsResolver implements ResolverInterface, MimeResolverAwareIn
     protected $lfiProtectionOn = true;
 
     /**
-     * The mime resolver.
-     *
-     * @var MimeResolver
-     */
-    protected $mimeResolver;
-
-    /**
      * Constructor.
      * Construct object and set a new PriorityQueue.
      */
     public function __construct()
     {
         $this->paths = new PriorityQueue();
-    }
-
-    /**
-     * Set the mime resolver
-     *
-     * @param MimeResolver $resolver
-     */
-    public function setMimeResolver(MimeResolver $resolver)
-    {
-        $this->mimeResolver = $resolver;
-    }
-
-    /**
-     * Get the mime resolver
-     *
-     * @return MimeResolver
-     */
-    public function getMimeResolver()
-    {
-        return $this->mimeResolver;
     }
 
     /**
@@ -185,17 +158,15 @@ class PrioritizedPathsResolver implements ResolverInterface, MimeResolverAwareIn
         }
 
         foreach ($this->getPaths() as $path) {
-            $file = new SplFileInfo($path . $name);
+            $asset = $this->resolveFile($path . $name);
 
-            if ($file->isReadable() && !$file->isDir()) {
-                $filePath = $file->getRealPath();
-                $mimeType = $this->getMimeResolver()->getMimeType($name);
-                $asset    = new FileAsset($filePath);
-
-                $asset->mimetype = $mimeType;
-
-                return $asset;
+            if (!$asset) {
+                continue;
             }
+
+            $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
+
+            return $asset;
         }
 
         return null;
