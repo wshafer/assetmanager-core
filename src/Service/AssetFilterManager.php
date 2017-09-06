@@ -8,7 +8,7 @@ use AssetManager\Core\Exception;
 use AssetManager\Core\Resolver\MimeResolverAwareInterface;
 use Psr\Container\ContainerInterface;
 
-class AssetFilterManager implements MimeResolverAwareInterface
+class AssetFilterManager
 {
     /**
      * @var array Filter configuration.
@@ -19,11 +19,6 @@ class AssetFilterManager implements MimeResolverAwareInterface
      * @var ContainerInterface
      */
     protected $container;
-
-    /**
-     * @var MimeResolver
-     */
-    protected $mimeResolver;
     
     /**
      * @var FilterInterface[] Filters already instantiated
@@ -33,7 +28,7 @@ class AssetFilterManager implements MimeResolverAwareInterface
     /**
      * Construct the AssetFilterManager
      *
-     * @param   array $config
+     * @param array $config
      */
     public function __construct(array $config = array())
     {
@@ -43,7 +38,7 @@ class AssetFilterManager implements MimeResolverAwareInterface
     /**
      * Get the filter configuration.
      *
-     * @return  array
+     * @return array
      */
     protected function getConfig()
     {
@@ -63,49 +58,84 @@ class AssetFilterManager implements MimeResolverAwareInterface
     /**
      * See if there are filters for the asset, and if so, set them.
      *
-     * @param   string          $path
-     * @param   AssetInterface  $asset
+     * @param string         $path
+     * @param AssetInterface $asset
      *
      * @throws Exception\RuntimeException on invalid filters
      */
     public function setFilters($path, AssetInterface $asset)
     {
+        $filters = $this->getFilters($path, $asset);
+
+        foreach ($filters as $filter) {
+            $this->setFilter($filter, $asset);
+        }
+    }
+
+    /**
+     * Get the filters from config based on path, mimetype or extension.
+     *
+     * @param string $path
+     * @param AssetInterface $asset
+     *
+     * @return array|mixed
+     */
+    protected function getFilters($path, AssetInterface $asset)
+    {
         $config = $this->getConfig();
 
         if (!empty($config[$path])) {
-            $filters = $config[$path];
-        } elseif (!empty($config[$asset->mimetype])) {
-            $filters = $config[$asset->mimetype];
-        } else {
-            $extension = $this->getMimeResolver()->getExtension($asset->mimetype);
-            if (!empty($config[$extension])) {
-                $filters = $config[$extension];
-            } else {
-                return;
-            }
+            return $config[$path];
         }
 
-        foreach ($filters as $filter) {
-            if (is_null($filter)) {
-                continue;
-            }
-            if (!empty($filter['filter'])) {
-                $this->ensureByFilter($asset, $filter['filter']);
-            } elseif (!empty($filter['service'])) {
-                $this->ensureByService($asset, $filter['service']);
-            } else {
-                throw new Exception\RuntimeException(
-                    'Invalid filter supplied. Expected Filter or Service.'
-                );
-            }
+        if (!empty($asset->mimetype) && !empty($config[$asset->mimetype])) {
+            return $config[$asset->mimetype];
         }
+
+        $extension = strtolower(pathinfo($asset->getSourcePath(), PATHINFO_EXTENSION));
+
+        if (!empty($config[$extension])) {
+            return $config[$extension];
+        }
+
+        return [];
+    }
+
+    /**
+     * Set the filter by filter or service
+     *
+     * @param string         $filter
+     * @param AssetInterface $asset
+     */
+    protected function setFilter($filter, AssetInterface $asset)
+    {
+        if (is_null($filter)) {
+            return;
+        }
+
+        if (!empty($filter['filter'])) {
+            $this->ensureByFilter($asset, $filter['filter']);
+
+            return;
+        }
+
+        if (!empty($filter['service'])) {
+            $this->ensureByService($asset, $filter['service']);
+
+            return;
+        }
+
+        throw new Exception\RuntimeException(
+            'Invalid filter supplied. Expected Filter or Service.'
+        );
     }
 
     /**
      * Ensure that the filters as service are set.
      *
-     * @param   AssetInterface  $asset
-     * @param   string          $service    A valid service name.
+     * @param AssetInterface $asset
+     * @param string         $service A valid service name.
+     *
      * @throws  Exception\RuntimeException
      */
     protected function ensureByService(AssetInterface $asset, $service)
@@ -122,8 +152,9 @@ class AssetFilterManager implements MimeResolverAwareInterface
     /**
      * Ensure that the filters as filter are set.
      *
-     * @param   AssetInterface  $asset
-     * @param   mixed           $filter    Either an instance of FilterInterface or a classname.
+     * @param AssetInterface $asset
+     * @param mixed          $filter Either an instance of FilterInterface or a classname.
+     *
      * @throws  Exception\RuntimeException
      */
     protected function ensureByFilter(AssetInterface $asset, $filter)
@@ -155,22 +186,6 @@ class AssetFilterManager implements MimeResolverAwareInterface
         $filterInstance = $this->filterInstances[$filterClass];
 
         $asset->ensureFilter($filterInstance);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getMimeResolver()
-    {
-        return $this->mimeResolver;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setMimeResolver(MimeResolver $resolver)
-    {
-        $this->mimeResolver = $resolver;
     }
 
     /**
