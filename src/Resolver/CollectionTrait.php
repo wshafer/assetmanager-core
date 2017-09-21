@@ -18,6 +18,7 @@ trait CollectionTrait
      * Collections should be arrays or Traversable objects with name => path pairs
      *
      * @param  array|\Traversable                  $collections
+     *
      * @throws InvalidArgumentException
      */
     public function setCollections($collections)

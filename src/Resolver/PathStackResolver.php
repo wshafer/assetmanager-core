@@ -32,6 +32,8 @@ class PathStackResolver extends FileResolverAbstract
      * Add many paths to the stack at once
      *
      * @param array|Traversable $paths
+     *
+     * @return void
      */
     public function addPaths($paths)
     {
@@ -44,6 +46,8 @@ class PathStackResolver extends FileResolverAbstract
      * Rest the path stack to the paths provided
      *
      * @param  Traversable|array                  $paths
+     *
+     * @return void
      * @throws Exception\InvalidArgumentException
      */
     public function setPaths($paths)
@@ -63,6 +67,7 @@ class PathStackResolver extends FileResolverAbstract
      * Normalize a path for insertion in the stack
      *
      * @param  string $path
+     *
      * @return string
      */
     protected function normalizePath($path)
@@ -77,6 +82,8 @@ class PathStackResolver extends FileResolverAbstract
      * Add a single path to the stack
      *
      * @param  string                             $path
+     *
+     * @return void
      * @throws Exception\InvalidArgumentException
      */
     public function addPath($path)
@@ -128,6 +135,7 @@ class PathStackResolver extends FileResolverAbstract
             }
 
             $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
+
             return $asset;
         }
 

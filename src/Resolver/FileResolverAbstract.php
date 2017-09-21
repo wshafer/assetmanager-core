@@ -21,17 +21,31 @@ abstract class FileResolverAbstract implements ResolverInterface, MimeResolverAw
     public function resolveFile($file)
     {
         if (filter_var($file, FILTER_VALIDATE_URL)) {
-            return $this->getHtmlAsset($file);
+            return $this->getHttpAsset($file);
         }
 
         return $this->getFileAsset($file);
     }
 
-    protected function getHtmlAsset($filePath)
+    /**
+     * Get an HTTP asset
+     *
+     * @param string $filePath
+     *
+     * @return HttpAsset
+     */
+    protected function getHttpAsset($filePath)
     {
         return new HttpAsset($filePath);
     }
 
+    /**
+     * Get a File Asset
+     *
+     * @param string $filePath
+     *
+     * @return FileAsset|null
+     */
     protected function getFileAsset($filePath)
     {
         $file = new \SplFileInfo($filePath);
@@ -49,6 +63,8 @@ abstract class FileResolverAbstract implements ResolverInterface, MimeResolverAw
      * Set the mime resolver
      *
      * @param MimeResolver $resolver
+     *
+     * @return void
      */
     public function setMimeResolver(MimeResolver $resolver)
     {
