@@ -52,6 +52,7 @@ class PrivateCollectionResolver extends FileResolverAbstract implements AssetFil
         }
 
         $collection = new AssetCollection;
+
         $collection->setTargetPath($name);
 
         foreach ($collectionMap[$name] as $path) {
