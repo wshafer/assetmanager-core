@@ -3,12 +3,10 @@
 namespace AssetManager\Core\Resolver;
 
 use Assetic\Asset\AssetCollection;
-use Assetic\Asset\AssetInterface;
 use AssetManager\Core\Exception;
 use AssetManager\Core\Service\AssetFilterManager;
 use AssetManager\Core\Service\AssetFilterManagerAwareInterface;
 use Traversable;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * This resolver allows the resolving of collections with no addition mapping.
@@ -67,6 +65,7 @@ class PrivateCollectionResolver extends FileResolverAbstract implements AssetFil
 
     /**
      * @param string $path
+     *
      * @return \Assetic\Asset\FileAsset|\Assetic\Asset\HttpAsset|null
      */
     public function getCollectionAsset($path)
@@ -86,6 +85,7 @@ class PrivateCollectionResolver extends FileResolverAbstract implements AssetFil
         }
 
         $this->getAssetFilterManager()->setFilters($path, $asset);
+
         return $asset;
     }
 

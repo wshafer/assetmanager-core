@@ -30,6 +30,7 @@ class AliasPathStackResolver extends FileResolverAbstract
      * Populate the array stack with a list of aliases and their corresponding paths
      *
      * @param  array                              $aliases
+     *
      * @throws Exception\InvalidArgumentException
      */
     public function __construct(array $aliases)
@@ -44,6 +45,7 @@ class AliasPathStackResolver extends FileResolverAbstract
      *
      * @param  string                             $alias
      * @param  string                             $path
+     *
      * @throws Exception\InvalidArgumentException
      */
     private function addAlias($alias, $path)
@@ -69,6 +71,7 @@ class AliasPathStackResolver extends FileResolverAbstract
      * Normalize a path for insertion in the stack
      *
      * @param  string $path
+     *
      * @return string
      */
     private function normalizePath($path)
