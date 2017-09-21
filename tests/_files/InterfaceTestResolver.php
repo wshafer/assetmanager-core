@@ -1,9 +1,9 @@
 <?php
 
-use AssetManager\Resolver;
-use AssetManager\Resolver\ResolverInterface;
-use AssetManager\Service\MimeResolver;
-use AssetManager\Service\AssetFilterManagerAwareInterface;
+use AssetManager\Core\Resolver;
+use AssetManager\Core\Resolver\ResolverInterface;
+use AssetManager\Core\Service\MimeResolver;
+use AssetManager\Core\Service\AssetFilterManagerAwareInterface;
 
 class InterfaceTestResolver implements
     Resolver\ResolverInterface,
@@ -48,7 +48,7 @@ class InterfaceTestResolver implements
 
     }
 
-    public function setAssetFilterManager(\AssetManager\Service\AssetFilterManager $filterManager)
+    public function setAssetFilterManager(\AssetManager\Core\Service\AssetFilterManager $filterManager)
     {
         $this->calledFilterManager = true;
     }
