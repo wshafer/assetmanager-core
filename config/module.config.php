@@ -21,8 +21,8 @@ return [
     'asset_manager'   => [
         'clear_output_buffer' => true,
         'resolvers'           => [
-            AssetManager\Core\Resolver\MapResolver::class               => 3000,
-            AssetManager\Core\Resolver\ConcatResolver::class            => 2500,
+            AssetManager\Core\Resolver\MapResolver::class               => 3500,
+            AssetManager\Core\Resolver\ConcatResolver::class            => 3000,
             AssetManager\Core\Resolver\PrivateCollectionResolver::class => 2500,
             AssetManager\Core\Resolver\CollectionResolver::class        => 2000,
             AssetManager\Core\Resolver\PrioritizedPathsResolver::class  => 1500,
