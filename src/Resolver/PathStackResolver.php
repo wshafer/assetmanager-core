@@ -2,8 +2,10 @@
 
 namespace AssetManager\Core\Resolver;
 
+use Assetic\Asset\FileAsset;
 use Assetic\Factory\Resource\DirectoryResource;
 use AssetManager\Core\Exception;
+use AssetManager\Core\Service\MimeResolver;
 use SplFileInfo;
 use Traversable;
 use Zend\Stdlib\SplStack;
@@ -11,7 +13,7 @@ use Zend\Stdlib\SplStack;
 /**
  * This resolver allows you to resolve from a stack of paths.
  */
-class PathStackResolver extends FileResolverAbstract
+class PathStackResolver implements ResolverInterface, MimeResolverAwareInterface
 {
     /**
      * @var SplStack
@@ -26,11 +28,38 @@ class PathStackResolver extends FileResolverAbstract
     protected $lfiProtectionOn = true;
 
     /**
+     * The mime resolver.
+     *
+     * @var MimeResolver
+     */
+    protected $mimeResolver;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->paths = new SplStack();
+    }
+
+    /**
+     * Set the mime resolver
+     *
+     * @param MimeResolver $resolver
+     */
+    public function setMimeResolver(MimeResolver $resolver)
+    {
+        $this->mimeResolver = $resolver;
+    }
+
+    /**
+     * Get the mime resolver
+     *
+     * @return MimeResolver
+     */
+    public function getMimeResolver()
+    {
+        return $this->mimeResolver;
     }
 
     /**
@@ -147,15 +176,17 @@ class PathStackResolver extends FileResolverAbstract
         }
 
         foreach ($this->getPaths() as $path) {
-            $asset = $this->resolveFile($path . $name);
+            $file = new SplFileInfo($path . $name);
 
-            if (!$asset) {
-                return null;
+            if ($file->isReadable() && !$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $mimeType = $this->getMimeResolver()->getMimeType($name);
+                $asset    = new FileAsset($filePath);
+
+                $asset->mimetype = $mimeType;
+
+                return $asset;
             }
-
-            $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
-
-            return $asset;
         }
 
         return null;

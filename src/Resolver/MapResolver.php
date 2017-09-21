@@ -2,19 +2,27 @@
 
 namespace AssetManager\Core\Resolver;
 
+use Assetic\Asset\FileAsset;
+use Assetic\Asset\HttpAsset;
 use AssetManager\Core\Exception;
+use AssetManager\Core\Service\MimeResolver;
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
 
 /**
  * This resolver allows you to resolve using a 1 on 1 mapping to a file.
  */
-class MapResolver extends FileResolverAbstract
+class MapResolver implements ResolverInterface, MimeResolverAwareInterface
 {
     /**
      * @var array
      */
     protected $map = array();
+
+    /**
+     * @var MimeResolver The mime resolver.
+     */
+    protected $mimeResolver;
 
     /**
      * Constructor
@@ -26,6 +34,26 @@ class MapResolver extends FileResolverAbstract
     public function __construct($map = array())
     {
         $this->setMap($map);
+    }
+
+    /**
+     * Set the mime resolver
+     *
+     * @param MimeResolver $resolver
+     */
+    public function setMimeResolver(MimeResolver $resolver)
+    {
+        $this->mimeResolver = $resolver;
+    }
+
+    /**
+     * Get the mime resolver
+     *
+     * @return MimeResolver
+     */
+    public function getMimeResolver()
+    {
+        return $this->mimeResolver;
     }
 
     /**
@@ -72,13 +100,16 @@ class MapResolver extends FileResolverAbstract
             return null;
         }
 
-        $asset = $this->resolveFile($this->map[$name]);
+        $file            = $this->map[$name];
+        $mimeType        = $this->getMimeResolver()->getMimeType($name);
 
-        if (!$asset) {
-            return null;
+        if (false === filter_var($file, FILTER_VALIDATE_URL)) {
+            $asset = new FileAsset($file);
+        } else {
+            $asset = new HttpAsset($file);
         }
 
-        $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
+        $asset->mimetype = $mimeType;
 
         return $asset;
     }

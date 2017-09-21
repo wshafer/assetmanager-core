@@ -2,15 +2,17 @@
 
 namespace AssetManager\Core\Resolver;
 
+use Assetic\Asset\FileAsset;
 use Assetic\Factory\Resource\DirectoryResource;
 use AssetManager\Core\Exception;
+use AssetManager\Core\Service\MimeResolver;
 use SplFileInfo;
 use Zend\Stdlib\SplStack;
 
 /**
  * This resolver allows you to resolve from a stack of aliases to a path.
  */
-class AliasPathStackResolver extends FileResolverAbstract
+class AliasPathStackResolver implements ResolverInterface, MimeResolverAwareInterface
 {
     /**
      * @var array
@@ -23,6 +25,13 @@ class AliasPathStackResolver extends FileResolverAbstract
      * @var bool
      */
     protected $lfiProtectionOn = true;
+
+    /**
+     * The mime resolver.
+     *
+     * @var MimeResolver
+     */
+    protected $mimeResolver;
 
     /**
      * Constructor
@@ -77,6 +86,26 @@ class AliasPathStackResolver extends FileResolverAbstract
     }
 
     /**
+     * Set the mime resolver
+     *
+     * @param MimeResolver $resolver
+     */
+    public function setMimeResolver(MimeResolver $resolver)
+    {
+        $this->mimeResolver = $resolver;
+    }
+
+    /**
+     * Get the mime resolver
+     *
+     * @return MimeResolver
+     */
+    public function getMimeResolver()
+    {
+        return $this->mimeResolver;
+    }
+
+    /**
      * Set LFI protection flag
      *
      * @param  bool $flag
@@ -113,15 +142,17 @@ class AliasPathStackResolver extends FileResolverAbstract
 
             $filename = substr_replace($name, '', 0, strlen($alias));
 
-            $asset = $this->resolveFile($path . $filename);
+            $file = new SplFileInfo($path . $filename);
 
-            if (!$asset) {
-                continue;
+            if ($file->isReadable() && !$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $mimeType = $this->getMimeResolver()->getMimeType($name);
+                $asset    = new FileAsset($filePath);
+
+                $asset->mimetype = $mimeType;
+
+                return $asset;
             }
-
-            $asset->mimetype = $this->getMimeResolver()->getMimeType($name);
-
-            return $asset;
         }
 
         return null;
